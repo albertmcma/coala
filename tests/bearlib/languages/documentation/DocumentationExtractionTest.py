@@ -40,6 +40,7 @@ class DocumentationExtractionTest(unittest.TestCase):
                  " This is the main function.\n"
                  "\n"
                  " @returns Your favorite number.\n"),
+                "C", "doxygen",
                 docstyle_C_doxygen.markers[0],
                 TextRange.from_values(3, 1, 7, 4)),
             DocumentationComment(
@@ -48,6 +49,7 @@ class DocumentationExtractionTest(unittest.TestCase):
                  " - Main item\n"
                  "   - sub item\n"
                  "     - sub sub item\n"),
+                "C", "doxygen",
                 docstyle_C_doxygen.markers[2],
                 TextRange.from_values(15, 1, 20, 4)),
             DocumentationComment(
@@ -55,16 +57,19 @@ class DocumentationExtractionTest(unittest.TestCase):
                  "    Another type of comment\n"
                  "\n"
                  "    ..."),
+                "C", "doxygen",
                 docstyle_C_doxygen.markers[1],
                 TextRange.from_values(23, 1, 26, 11)),
             DocumentationComment(
                 (" foobar = barfoo.\n"
                  " @param x whatever...\n"),
+                "C", "doxygen",
                 docstyle_C_doxygen.markers[0],
                 TextRange.from_values(28, 1, 30, 4)))
 
-        self.assertEqual(tuple(extract_documentation(data, "C", "doxygen")),
-                         expected_results)
+        self.assertEqual(tuple(
+            extract_documentation(data, "C", "doxygen")),
+            expected_results)
 
     def test_extract_documentation_C_2(self):
         data = ['/** my main description\n', ' * continues here */']
@@ -74,6 +79,7 @@ class DocumentationExtractionTest(unittest.TestCase):
         self.assertEqual(
             list(extract_documentation(data, "C", "doxygen")),
             [DocumentationComment(" my main description\n continues here",
+                                  "C", "doxygen",
                                   docstyle_C_doxygen.markers[0],
                                   TextRange.from_values(1, 1, 2, 21))])
 
@@ -86,54 +92,61 @@ class DocumentationExtractionTest(unittest.TestCase):
 
         docstyle_CPP_doxygen = DocstyleDefinition.load("CPP", "doxygen")
 
-        self.assertEqual(tuple(extract_documentation(data, "CPP", "doxygen")),
-                         (DocumentationComment(
-                             ("\n"
-                              " This is the main function.\n"
-                              " @returns Exit code.\n"
-                              "          Or any other number.\n"),
-                             docstyle_CPP_doxygen.markers[0],
-                             TextRange.from_values(4, 1, 8, 4)),
-                          DocumentationComment(
-                              (" foobar\n"
-                               " @param xyz\n"),
-                              docstyle_CPP_doxygen.markers[0],
-                              TextRange.from_values(15, 1, 17, 4)),
-                          DocumentationComment(
-                              " Some alternate style of documentation\n",
-                              docstyle_CPP_doxygen.markers[4],
-                              TextRange.from_values(22, 1, 23, 1)),
-                          DocumentationComment(
-                              " ends instantly",
-                              docstyle_CPP_doxygen.markers[0],
-                              TextRange.from_values(26, 5, 26, 26)),
-                          DocumentationComment(
-                              (" Should work\n"
-                               "\n"
-                               " even without a function standing below.\n"
-                               "\n"
-                               " @param foo WHAT PARAM PLEASE!?\n"),
-                              docstyle_CPP_doxygen.markers[4],
-                              TextRange.from_values(32, 1, 37, 1))))
+        self.assertEqual(tuple(
+            extract_documentation(data, "CPP", "doxygen")),
+            (DocumentationComment(
+                ("\n"
+                 " This is the main function.\n"
+                 " @returns Exit code.\n"
+                 "          Or any other number.\n"),
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[0],
+                TextRange.from_values(4, 1, 8, 4)),
+             DocumentationComment(
+                (" foobar\n"
+                 " @param xyz\n"),
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[0],
+                TextRange.from_values(15, 1, 17, 4)),
+             DocumentationComment(
+                " Some alternate style of documentation\n",
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[4],
+                TextRange.from_values(22, 1, 23, 1)),
+             DocumentationComment(
+                " ends instantly",
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[0],
+                TextRange.from_values(26, 5, 26, 26)),
+             DocumentationComment(
+                (" Should work\n"
+                 "\n"
+                 " even without a function standing below.\n"
+                 "\n"
+                 " @param foo WHAT PARAM PLEASE!?\n"),
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[4],
+                TextRange.from_values(32, 1, 37, 1))))
 
     def test_extract_documentation_CPP_2(self):
         data = DocumentationExtractionTest.load_testdata("data2.cpp")
 
         docstyle_CPP_doxygen = DocstyleDefinition.load("CPP", "doxygen")
 
-        self.assertEqual(tuple(extract_documentation(data, "CPP", "doxygen")),
-                         (DocumentationComment(
-                             ("module comment\n"
-                              " hello world\n"),
-                             docstyle_CPP_doxygen.markers[0],
-                             TextRange.from_values(1, 1, 3, 4)),))
+        self.assertEqual(tuple(
+            extract_documentation(data, "CPP", "doxygen",)),
+            (DocumentationComment(
+                ("module comment\n"
+                 " hello world\n"),
+                "CPP", "doxygen",
+                docstyle_CPP_doxygen.markers[0],
+                TextRange.from_values(1, 1, 3, 4)),))
 
     def test_extract_documentation_PYTHON3(self):
         data = DocumentationExtractionTest.load_testdata("data.py")
-
-        docstyle_PYTHON3_default = DocstyleDefinition.load("PYTHON3",
+        docstyle_PYTHON3_default = DocstyleDefinition.load("python3",
                                                            "default")
-        docstyle_PYTHON3_doxygen = DocstyleDefinition.load("PYTHON3",
+        docstyle_PYTHON3_doxygen = DocstyleDefinition.load("python3",
                                                            "doxygen")
 
         expected = (
@@ -142,12 +155,14 @@ class DocumentationExtractionTest(unittest.TestCase):
                  "Module description.\n"
                  "\n"
                  "Some more foobar-like text.\n"),
+                "python3", "default",
                 docstyle_PYTHON3_default.markers[0],
                 TextRange.from_values(1, 1, 5, 4)),
             DocumentationComment(
                 ("\n"
                  "A nice and neat way of documenting code.\n"
                  ":param radius: The explosion radius.\n"),
+                "python3", "default",
                 docstyle_PYTHON3_default.markers[0],
                 TextRange.from_values(8, 5, 11, 8)),
             DocumentationComment(
@@ -157,26 +172,31 @@ class DocumentationExtractionTest(unittest.TestCase):
                  "    layouts inside docs are preserved for these "
                  "documentation styles.\n"
                  "this is intended.\n"),
+                "python3", "default",
                 docstyle_PYTHON3_default.markers[0],
                 TextRange.from_values(14, 1, 19, 4)),
             DocumentationComment(
                 (" Docstring directly besides triple quotes.\n"
                  "    Continues here. "),
+                "python3", "default",
                 docstyle_PYTHON3_default.markers[0],
                 TextRange.from_values(21, 1, 22, 24)),
             DocumentationComment(
                 ("super\n"
                  " nicely\n"
                  "short"),
+                "python3", "default",
                 docstyle_PYTHON3_default.markers[0],
                 TextRange.from_values(35, 1, 37, 9)))
 
         self.assertEqual(
-            tuple(extract_documentation(data, "PYTHON3", "default")),
+            tuple(extract_documentation(data, "python3", "default")),
             expected)
 
         # Change only the docstyle in expected results.
         expected = list(DocumentationComment(r.documentation,
+                                             r.language,
+                                             "doxygen",
                                              r.marker,
                                              r.range)
                         for r in expected)
@@ -187,34 +207,37 @@ class DocumentationExtractionTest(unittest.TestCase):
              " More subtext (not correctly aligned)\n"
              "      sub-sub-text\n"
              "\n"),
+            "python3", "doxygen",
             docstyle_PYTHON3_doxygen.markers[1],
             TextRange.from_values(25, 1, 30, 1)))
 
         self.assertEqual(
-            list(extract_documentation(data, "PYTHON3", "doxygen")),
+            list(extract_documentation(data, "python3", "doxygen")),
             expected)
 
     def test_extract_documentation_PYTHON3_2(self):
         data = ['\n', '""" documentation in single line  """\n', 'print(1)\n']
 
-        docstyle_PYTHON3_default = DocstyleDefinition.load("PYTHON3",
+        docstyle_PYTHON3_default = DocstyleDefinition.load("python3",
                                                            "default")
 
         self.assertEqual(
-            list(extract_documentation(data, "PYTHON3", "default")),
+            list(extract_documentation(data, "python3", "default")),
             [DocumentationComment(" documentation in single line  ",
+                                  "python3", "default",
                                   docstyle_PYTHON3_default.markers[0],
                                   TextRange.from_values(2, 1, 2, 38))])
 
     def test_extract_documentation_PYTHON3_3(self):
         data = ['## documentation in single line without return at end.']
 
-        docstyle_PYTHON3_doxygen = DocstyleDefinition.load("PYTHON3",
+        docstyle_PYTHON3_doxygen = DocstyleDefinition.load("python3",
                                                            "doxygen")
 
         self.assertEqual(
-            list(extract_documentation(data, "PYTHON3", "doxygen")),
+            list(extract_documentation(data, "python3", "doxygen")),
             [DocumentationComment(" documentation in single line without "
                                   "return at end.",
+                                  "python3", "doxygen",
                                   docstyle_PYTHON3_doxygen.markers[1],
                                   TextRange.from_values(1, 1, 1, 55))])
