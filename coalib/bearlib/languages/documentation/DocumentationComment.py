@@ -52,6 +52,9 @@ class DocumentationComment:
         if self.language == "python" and self.docstyle == "default":
             return self._parse_documentation_with_symbols((":param ", ": "),
                                                           ":return:")
+        elif self.language == "python" and self.docstyle == "doxygen":
+            return self._parse_documentation_with_symbols(("@param ", " "),
+                                                          "@return")
         else:
             raise NotImplementedError(
                 "Documentation parsing for {0.language!r} in {0.docstyle!r}"
@@ -82,8 +85,9 @@ class DocumentationComment:
         for line in lines:
             if line.strip().startswith(param_identifiers[0]):
                 parse_mode = self.Parameter
-                splitted = line[len(param_identifiers[0]):].split(
-                    param_identifiers[1], 1)
+                param_offset = line.rfind(
+                    param_identifiers[0]) + len(param_identifiers[0])
+                splitted = line[param_offset:].split(param_identifiers[1], 1)
                 cur_param = splitted[0].strip()
                 param_desc = ""
                 # For cases where the param description is not on the
